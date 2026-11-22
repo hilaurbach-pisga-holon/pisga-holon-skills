@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ברקודים לשולחנות</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+@page { size: A4; margin: 10mm; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Heebo', Arial, sans-serif; direction: rtl; color: #13223F; background: #EEF3F8; }
+.bar { padding: 14px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.bar button { font: inherit; font-weight: 700; border: 0; border-radius: 12px; padding: 10px 16px; background: #2F6BFF; color: #fff; cursor: pointer; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8mm; padding: 0 16px 16px; }
+.tk { background: #fff; border-radius: 6mm; overflow: hidden; break-inside: avoid; border: 1px solid #D9DEE7; display: flex; flex-direction: column; }
+.tk .hd { background: #0B1B3A; color: #fff; padding: 4mm 6mm; display: flex; justify-content: space-between; align-items: center; }
+.tk .hd b { color: #FFC845; font-size: 11pt; letter-spacing: .5px; }
+.tk .hd span { font-size: 22pt; font-weight: 900; }
+.tk .bd { padding: 5mm 6mm; display: flex; gap: 5mm; align-items: center; }
+.tk .q img, .tk .q canvas { width: 38mm !important; height: 38mm !important; display: block; }
+.tk h2 { margin: 0 0 2mm; font-size: 15pt; font-weight: 900; }
+.tk p { margin: 0; font-size: 10.5pt; line-height: 1.4; }
+@media print { body { background: #fff; } .bar { display: none; } .grid { padding: 0; } }
+</style>
+</head>
+<body>
+<div class="bar"><button type="button" onclick="window.print()">הדפסה</button><span>כרטיס לכל שולחן. הברקוד כבר יודע מה מספר השולחן. מספר כרטיסים: הוסיפו לכתובת ?n=10</span></div>
+<div class="grid" id="grid"></div>
+<script>
+var BASE = new URL('wall-form.html?table=', location.href).href;
+var N = Math.min(Math.max(parseInt(new URLSearchParams(location.search).get('n'), 10) || 8, 1), 20);
+var g = document.getElementById('grid');
+for (var i = 1; i <= N; i++) {
+  var t = document.createElement('div'); t.className = 'tk';
+  t.innerHTML = '<div class="hd"><b>✈ כרטיס עלייה · תוכנית טיסה</b><span>שולחן ' + i + '</span></div><div class="bd"><div class="q"></div><div><h2>מסיימים? סורקים ושולחים</h2><p>מעתיקים את תוכנית הטיסה מהדף לטופס. התוצר יופיע מיד על הקיר במצגת.</p></div></div>';
+  g.appendChild(t);
+  try { new QRCode(t.querySelector('.q'), { text: BASE + i, width: 300, height: 300, correctLevel: QRCode.CorrectLevel.M }); } catch (e) { t.querySelector('.q').textContent = BASE + i; }
+}
+</script>
+</body>
+</html>
