@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מגדל הפיקוח: לוח הנחיתות</title>
+<script src="wall-config.js"></script>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root { --sky:#0B1B3A; --sky2:#132A57; --panel:#0F2347; --ink:#EAF0FA; --muted:#A3B3D1; --gold:#FFC845; --c1:#3CC6B5; --c2:#FFC845; --c3:#6E98FF; --c4:#FF8466; --card:#FFFFFF; --cink:#13223F; --cmuted:#56627C; --line:#E3E8F0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font-family: 'Heebo', Arial, sans-serif; direction: rtl; text-align: right; color: var(--ink); background: radial-gradient(ellipse at 80% -10%, #24427F 0%, transparent 55%), linear-gradient(170deg, var(--sky), var(--sky2)); min-height: 100vh; }
+.top { display: flex; align-items: center; gap: 20px; padding: 18px 28px 12px; }
+.tower { width: 56px; height: 56px; border-radius: 16px; background: rgba(255,255,255,.08); display: grid; place-items: center; flex: none; }
+.tower svg { width: 32px; height: 32px; }
+h1 { margin: 0; font-size: clamp(24px, 3vw, 40px); font-weight: 900; line-height: 1.05; }
+.sub { margin: 2px 0 0; color: var(--muted); font-size: clamp(13px, 1.2vw, 17px); font-weight: 500; }
+.stat { margin-inline-start: auto; text-align: center; background: rgba(255,255,255,.07); border-radius: 16px; padding: 8px 18px; }
+.stat b { display: block; font-size: clamp(28px, 3.2vw, 46px); font-weight: 900; color: var(--gold); line-height: 1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 13px; color: var(--muted); font-weight: 700; }
+.qrbox { background: #fff; border-radius: 16px; padding: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--cink); font-size: 12px; font-weight: 800; }
+.qrbox #qr img, .qrbox #qr canvas { width: clamp(84px, 8vw, 120px) !important; height: auto !important; display: block; }
+.ctrl { display: flex; gap: 8px; padding: 0 28px 8px; flex-wrap: wrap; }
+.ctrl button { font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.ctrl button[aria-pressed="true"] { color: var(--sky); background: var(--gold); border-color: var(--gold); }
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 16px; padding: 8px 28px 28px; align-items: start; }
+.empty { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--muted); font-size: clamp(18px, 2vw, 26px); }
+.empty b { display: block; font-size: clamp(26px, 3vw, 40px); color: var(--ink); margin-bottom: 6px; }
+.card { background: var(--card); color: var(--cink); border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; cursor: zoom-in; box-shadow: 0 14px 34px rgba(0,0,0,.25); position: relative; }
+.card.fresh { animation: land .9s ease-out both; }
+@keyframes land { 0% { opacity: 0; transform: translateY(-24px) scale(.97); } 60% { opacity: 1; } 100% { transform: none; } }
+.card.fresh::after { content: 'נחת עכשיו'; position: absolute; top: -10px; left: 14px; background: var(--gold); color: var(--sky); font-size: 12px; font-weight: 900; border-radius: 999px; padding: 2px 10px; animation: fade 6s forwards; }
+@keyframes fade { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+.chead { display: flex; gap: 10px; align-items: flex-start; }
+.gate { flex: none; background: var(--sky); color: var(--gold); border-radius: 12px; padding: 4px 10px; text-align: center; line-height: 1.1; }
+.gate small { display: block; font-size: 11px; font-weight: 700; color: var(--muted); }
+.gate b { font-size: 24px; font-weight: 900; }
+.ct { min-width: 0; flex: 1; }
+.ct h2 { margin: 0; font-size: 20px; font-weight: 900; line-height: 1.2; }
+.ct .ab { font-size: 15px; font-weight: 700; color: var(--cmuted); }
+.ct .grp { font-size: 12px; font-weight: 800; color: #0F8A7A; }
+.def { margin: 0; font-size: 14px; color: var(--cmuted); border-right: 3px solid var(--line); padding-right: 8px; }
+.lv { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+.lv li { display: grid; grid-template-columns: 70px 1fr; gap: 8px; align-items: start; font-size: 15px; line-height: 1.35; }
+.lv li span:first-child { font-size: 12px; font-weight: 900; border-radius: 999px; padding: 2px 6px; text-align: center; color: #fff; background: var(--c); }
+.lv li:nth-child(2) span:first-child { color: var(--cink); }
+.lv li.blank span:last-child { color: #B6BFCE; }
+.move { background: #FFF4CF; border-radius: 12px; padding: 6px 10px; font-size: 14px; }
+.move b { font-size: 12px; color: var(--cmuted); display: block; }
+mark.camw { background: transparent; color: #C2410C; font-weight: 800; text-decoration: underline wavy #E2552F; text-underline-offset: 3px; }
+.camflag { font-size: 12px; font-weight: 800; color: #C2410C; background: #FDE8E1; border-radius: 999px; padding: 2px 10px; align-self: flex-start; }
+body.nocam mark.camw { color: inherit; font-weight: inherit; text-decoration: none; }
+body.nocam .camflag { display: none; }
+body.noqr .qrbox { display: none; }
+.overlay { position: fixed; inset: 0; background: rgba(5,12,28,.78); display: grid; place-items: center; padding: 3vw; z-index: 5; cursor: zoom-out; }
+.overlay .card { width: min(1100px, 100%); max-height: 92vh; overflow: auto; cursor: auto; padding: 28px 32px; gap: 14px; }
+.overlay .ct h2 { font-size: clamp(26px, 3vw, 40px); }
+.overlay .ct .ab { font-size: clamp(18px, 1.8vw, 24px); }
+.overlay .lv li { font-size: clamp(18px, 2vw, 28px); grid-template-columns: 120px 1fr; gap: 14px; }
+.overlay .lv li span:first-child { font-size: clamp(14px, 1.3vw, 18px); }
+.overlay .def, .overlay .move { font-size: clamp(16px, 1.6vw, 22px); }
+.foot { text-align: center; color: var(--muted); font-size: 12px; padding: 0 0 16px; }
+@media (prefers-reduced-motion: reduce) { .card.fresh { animation: none; } }
+@media (max-width: 640px) { .top { flex-wrap: wrap; padding: 14px 16px 8px; } .ctrl, .board { padding-left: 16px; padding-right: 16px; } .qrbox { display: none; } }
+</style>
+</head>
+<body>
+<div id="notset" hidden style="background:#FDE8E1;color:#B2361A;font-weight:700;padding:12px 16px;text-align:center">הקיר עוד לא מחובר לגיליון. צריך להדביק את כתובת ה-exec בקובץ wall-config.js.</div>
+<div class="top">
+  <div class="tower" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#FFC845" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21l1-9h4l1 9"/><path d="M7 12h10l-1.5-4h-7z"/><path d="M12 8V4"/><path d="M9.5 3.5a3.5 3.5 0 0 1 5 0"/></svg></div>
+  <div>
+    <h1>מגדל הפיקוח: לוח הנחיתות</h1>
+    <p class="sub">תוכניות הטיסה של השולחנות, בזמן אמת · מרכז הל"ה למיומנויות</p>
+  </div>
+  <div class="stat"><b id="count">0</b><span>שולחנות נחתו</span></div>
+  <div class="qrbox"><div id="qr"></div>סורקים ושולחים</div>
+</div>
+<div class="ctrl">
+  <button type="button" id="tCam" aria-pressed="true">סימון מבחן המצלמה</button>
+  <button type="button" id="tQr" aria-pressed="true">ברקוד</button>
+</div>
+<main class="board" id="board" aria-live="polite">
+  <div class="empty"><b>המסלולים בדרך</b>ממתינים לשולחן הראשון שינחת...</div>
+</main>
+<div class="foot">הצעה של מרכז הל"ה למיומנויות, פסג"ה חולון · לחיצה על כרטיס מגדילה אותו</div>
+
+<script>
+var FORM_URL = new URL('wall-form.html', location.href).href;
+var LV = [['מתגלה', '#0F8A7A'], ['מתפתח/ת', '#F2B705'], ['מסוגל/ת', '#2F6BFF'], ['מיומן/ת', '#E2552F']];
+var HIDDEN = ['מבין','מבינה','יבין','הבנה','יודע','יודעת','ידע','מודע','מודעת','מודעות','מעריך','מעריכה','מכיר','מכירה','לומד','לומדת','חושב','חושבת','מרגיש','מרגישה','מפנים','מפנימה','רוצה','אוהב','אוהבת','מתעניין','מתעניינת','מסוגל','מסוגלת','שולט','שולטת','זוכר','זוכרת','מאמין','מקבל','מכבד'];
+var seen = {}, first = true, rows = [], openTable = null;
+function el(t, c, x) { var n = document.createElement(t); if (c) n.className = c; if (x != null) n.textContent = x; return n; }
+try { new QRCode(document.getElementById('qr'), { text: FORM_URL, width: 240, height: 240, correctLevel: QRCode.CorrectLevel.M }); } catch (e) {}
+
+function isHidden(w) { var b = w.replace(/[.,:;!?"׳״'()]/g, ''); return HIDDEN.indexOf(b) > -1 || HIDDEN.indexOf(b.replace(/^[והשבלכמ](?=\S{3,})/, '')) > -1; }
+function camText(parent, text) {
+  var n = 0;
+  text.split(/(\s+)/).forEach(function (part) {
+    if (part && !/^\s+$/.test(part) && isHidden(part)) { parent.appendChild(el('mark', 'camw', part)); n++; }
+    else parent.appendChild(document.createTextNode(part));
+  });
+  return n;
+}
+function card(r, fresh) {
+  var c = el('article', 'card' + (fresh ? ' fresh' : ''));
+  var h = el('div', 'chead');
+  var g = el('div', 'gate'); g.appendChild(el('small', null, 'שולחן')); g.appendChild(el('b', null, r.table)); h.appendChild(g);
+  var ct = el('div', 'ct');
+  if (r.group) ct.appendChild(el('div', 'grp', r.group));
+  ct.appendChild(el('h2', null, r.skill || 'מיומנות'));
+  if (r.ability) ct.appendChild(el('div', 'ab', r.ability));
+  h.appendChild(ct); c.appendChild(h);
+  if (r.def) c.appendChild(el('p', 'def', r.def));
+  var ol = el('ol', 'lv'), hits = 0;
+  ['l1', 'l2', 'l3', 'l4'].forEach(function (k, i) {
+    var li = el('li', r[k] ? '' : 'blank'); var t = el('span', null, LV[i][0]); t.style.setProperty('--c', LV[i][1]); li.appendChild(t);
+    var s = el('span'); if (r[k]) hits += camText(s, r[k]); else s.textContent = '...'; li.appendChild(s);
+    ol.appendChild(li);
+  });
+  c.appendChild(ol);
+  if (r.tmove) { var m = el('div', 'move'); m.appendChild(el('b', null, 'איך עוברים' + (r.tfrom ? ': ' + r.tfrom : ''))); m.appendChild(document.createTextNode(r.tmove)); c.appendChild(m); }
+  if (hits) c.appendChild(el('span', 'camflag', 'מבחן המצלמה: ' + hits + (hits === 1 ? ' מילה לבדיקה' : ' מילים לבדיקה')));
+  c.addEventListener('click', function (e) { e.stopPropagation(); if (!c.closest('.overlay')) openCard(r.table); });
+  return c;
+}
+function render() {
+  var b = document.getElementById('board');
+  document.getElementById('count').textContent = rows.length;
+  if (!rows.length) return;
+  b.innerHTML = '';
+  rows.forEach(function (r) {
+    var sig = r.table + '|' + r.ts;
+    var fresh = !first && !seen[sig];
+    seen[sig] = 1;
+    b.appendChild(card(r, fresh));
+  });
+  first = false;
+  if (openTable) openCard(openTable, true);
+}
+function openCard(table, refresh) {
+  var r = rows.filter(function (x) { return x.table === table; })[0];
+  var ov = document.querySelector('.overlay');
+  if (!r) { if (ov) ov.remove(); openTable = null; return; }
+  if (!ov) { ov = el('div', 'overlay'); ov.addEventListener('click', function () { ov.remove(); openTable = null; }); document.body.appendChild(ov); }
+  ov.innerHTML = ''; ov.appendChild(card(r, false)); openTable = table;
+}
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var ov = document.querySelector('.overlay'); if (ov) ov.remove(); openTable = null; } });
+function poll() {
+  if (!window.WALL_API) { document.getElementById('notset').hidden = false; return; }
+  fetch(window.WALL_API + '?t=' + Date.now())
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var sig = JSON.stringify(d.rows || []);
+      if (sig !== poll.last) { poll.last = sig; rows = d.rows || []; render(); }
+      setTimeout(poll, 4000);
+    })
+    .catch(function () { setTimeout(poll, 8000); });
+}
+poll();
+function toggle(btn, cls) {
+  btn.addEventListener('click', function () { var on = btn.getAttribute('aria-pressed') !== 'true'; btn.setAttribute('aria-pressed', String(on)); document.body.classList.toggle(cls, !on); });
+}
+toggle(document.getElementById('tCam'), 'nocam');
+toggle(document.getElementById('tQr'), 'noqr');
+</script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>תוכנית הטיסה של השולחן</title>
+<script src="wall-config.js"></script>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&display=swap">
+<style>
+:root { --sky:#0B1B3A; --sky2:#132A57; --ink:#13223F; --muted:#56627C; --paper:#FFFFFF; --bg:#EEF3F8; --line:#D9DEE7; --route:#2F6BFF; --route-soft:#E3EBFF; --here:#0F8A7A; --here-soft:#DDF4EF; --dest:#E2552F; --dest-soft:#FDE8E1; --gold:#F2B705; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Heebo', Arial, sans-serif; background: var(--bg); color: var(--ink); direction: rtl; text-align: right; font-size: 16px; line-height: 1.5; }
+header { background: linear-gradient(160deg, var(--sky), var(--sky2)); color: #fff; padding: 22px 16px 26px; }
+header .in, main { max-width: 640px; margin: 0 auto; }
+.pass { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 800; color: var(--gold); letter-spacing: .5px; }
+h1 { margin: 6px 0 4px; font-size: 28px; font-weight: 900; line-height: 1.15; }
+header p { margin: 0; opacity: .85; font-size: 15px; }
+main { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.sec { background: var(--paper); border-radius: 20px; padding: 16px; box-shadow: 0 8px 24px rgba(19,34,63,.08); display: flex; flex-direction: column; gap: 12px; }
+.sec h2 { margin: 0; font-size: 18px; font-weight: 900; display: flex; gap: 10px; align-items: center; }
+.num { width: 28px; height: 28px; border-radius: 9px; background: var(--route-soft); color: var(--route); display: grid; place-items: center; font-size: 15px; flex: none; }
+label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 15px; }
+label small { font-weight: 500; color: var(--muted); font-size: 13px; }
+input, select, textarea { font: inherit; font-size: 16px; color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; }
+textarea { min-height: 64px; resize: vertical; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--route); background: #fff; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lvl { border-right: 5px solid var(--c); padding-right: 10px; }
+.lvl .tag { align-self: flex-start; display: inline-block; font-size: 13px; font-weight: 800; color: #fff; background: var(--c); border-radius: 999px; padding: 1px 10px; }
+.cam { font-size: 13px; font-weight: 700; border-radius: 10px; padding: 6px 10px; background: var(--dest-soft); color: var(--dest); }
+.cam:empty { display: none; }
+.btn { font: inherit; font-size: 18px; font-weight: 900; border: 0; border-radius: 16px; padding: 14px 18px; background: var(--route); color: #fff; cursor: pointer; width: 100%; }
+.btn[disabled] { opacity: .6; }
+.btn.ghost { background: #fff; color: var(--route); border: 2px solid var(--route); font-size: 16px; }
+.msg { font-weight: 700; border-radius: 12px; padding: 10px 12px; }
+.msg.err { background: var(--dest-soft); color: var(--dest); }
+.done { text-align: center; padding: 28px 16px; }
+.done .big { font-size: 56px; line-height: 1; }
+.done h2 { justify-content: center; font-size: 24px; }
+.hint { font-size: 14px; color: var(--muted); margin: 0; }
+[hidden] { display: none !important; }
+@media (max-width: 420px) { .row2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="notset" hidden style="background:#FDE8E1;color:#B2361A;font-weight:700;padding:12px 16px;text-align:center">הקיר עוד לא מחובר לגיליון. צריך להדביק את כתובת ה-exec בקובץ wall-config.js.</div>
+<header><div class="in">
+  <div class="pass">✈ כרטיס עלייה למטוס · מרכז הל"ה למיומנויות</div>
+  <h1>תוכנית הטיסה של השולחן</h1>
+  <p>מעתיקים לכאן את מה שכתבתם על הדף. אפשר לשלוח שוב כדי לעדכן, והקיר יתעדכן.</p>
+</div></header>
+
+<main id="formView">
+  <section class="sec">
+    <h2><span class="num">1</span>מי אנחנו</h2>
+    <div class="row2">
+      <label>מספר שולחן
+        <select id="table"><option value="">בחרו</option></select>
+      </label>
+      <label>שם הקבוצה <small>לא חובה</small>
+        <input id="group" maxlength="60" placeholder="למשל: הנווטים">
+      </label>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="num">2</span>היעד: מה פירקנו?</h2>
+    <label>מיומנות או ערך
+      <select id="skill"><option value="">בחרו</option></select>
+    </label>
+    <label>היכולת שבחרנו
+      <select id="ability" disabled><option value="">בחרו קודם מיומנות</option></select>
+    </label>
+    <label id="abilityOtherWrap" hidden>היכולת בניסוח שלנו
+      <input id="abilityOther" maxlength="160">
+    </label>
+    <label>ההגדרה שלנו, במשפט אחד <small>איך נסביר לתלמידים</small>
+      <textarea id="def" maxlength="300"></textarea>
+    </label>
+  </section>
+
+  <section class="sec">
+    <h2><span class="num">3</span>ארבע נקודות הציון</h2>
+    <p class="hint">בגוף ראשון ובחיוב, כך שמצלמה הייתה קולטת: "אני...".</p>
+    <div class="lvl" style="--c:#0F8A7A"><label><span class="tag">מתגלה</span><textarea id="l1" maxlength="400">אני </textarea></label><div class="cam" data-for="l1"></div></div>
+    <div class="lvl" style="--c:#F2B705"><label><span class="tag" style="color:#13223F">מתפתח/ת</span><textarea id="l2" maxlength="400">אני </textarea></label><div class="cam" data-for="l2"></div></div>
+    <div class="lvl" style="--c:#2F6BFF"><label><span class="tag">מסוגל/ת</span><textarea id="l3" maxlength="400">אני </textarea></label><div class="cam" data-for="l3"></div></div>
+    <div class="lvl" style="--c:#E2552F"><label><span class="tag">מיומן/ת</span><textarea id="l4" maxlength="400">אני </textarea></label><div class="cam" data-for="l4"></div></div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="num">4</span>מעבר אחד בין רמות</h2>
+    <label>מאיזו רמה לאיזו
+      <select id="tfrom">
+        <option value="">בחרו</option>
+        <option>מתגלה ← מתפתח/ת</option>
+        <option>מתפתח/ת ← מסוגל/ת</option>
+        <option>מסוגל/ת ← מיומן/ת</option>
+      </select>
+    </label>
+    <label>מה עושים בכיתה כדי לעבור? <small>פעולה קצרה, 5–15 דקות</small>
+      <textarea id="tmove" maxlength="300"></textarea>
+    </label>
+  </section>
+
+  <div class="msg err" id="err" hidden></div>
+  <button class="btn" id="send" type="button">שולחים למגדל הפיקוח ✈</button>
+</main>
+
+<main id="doneView" hidden>
+  <section class="sec done">
+    <div class="big">🛬</div>
+    <h2>נחתתם!</h2>
+    <p class="hint">תוכנית הטיסה של השולחן מופיעה עכשיו על הקיר.</p>
+    <button class="btn ghost" id="edit" type="button">עריכה ושליחה מחדש</button>
+  </section>
+</main>
+
+<script>
+var SKILLS = [{"c":"מיומנויות","s":[{"n":"אוריינות לשונית","a":["איתור מידע, פרשנות והיסק ממקור בודד","איתור מידע, פרשנות והיסק ממקורות מרובים","הערכה","הבעה בעל פה","הבעה בכתב"]},{"n":"אוריינות מתמטית","a":["אוריינות כמותית","ייצוג מופשט","חשיבה גאומטרית","אוריינות נתונים"]},{"n":"אוריינות מדעית","a":["התמצאות מדעית","הסבר מדעי של תופעות","תכנון, ביצוע והערכת מחקר","פרשנות מדעית של נתונים וראיות"]},{"n":"חשיבה ביקורתית","a":["הערכת מידע ומקורות מידע","טיעון","קבלת החלטות","הטלת ספק"]},{"n":"חשיבה יצירתית","a":["סקרנות ומקוריות","גמישות מחשבתית","תעוזה והתמדה","יצירת הקשרים חדשים","יישום"]},{"n":"אוריינות דיגיטלית","a":["תפעול ופתרון בעיות","צריכה ויצירה של תוכן במדיה הדיגיטלית","שיתופיות","אתיקה ומוגנות"]},{"n":"אוריינות מידע","a":["איתור מידע","הערכת מידע","ארגון מידע","שימוש במידע","הצגת מידע"]},{"n":"מודעות עצמית","a":["הכרת העצמי","זיהוי רגשות","מסוגלות עצמית"]},{"n":"הכוונה עצמית","a":["ויסות עצמי","הנעה עצמית","התמודדות עם לחץ ומשבר"]},{"n":"מודעות חברתית","a":["הבנת האחר","זיהוי מצבים חברתיים","רגישות חברתית-תרבותית"]},{"n":"התנהלות חברתית","a":["ניהול קונפליקטים","עבודת צוות","תקשורת וניהול יחסים בין-אישיים"]},{"n":"אוריינות גלובלית","a":["מודעות גלובלית","אחראיות גלובלית","התנהלות רב-תרבותית"]},{"n":"אוריינות גופנית-בריאותית","a":["ידע ומודעות בנושאי בריאות","אורח חיים בריא","תנועה ופעילות גופנית","שמירה על בטיחות, הימנעות מסיכונים והתמודדות עימם","התנהגות מינית בריאה"]}]},{"c":"ערכים","s":[{"n":"אהבת הדעת וחדוות הלמידה","a":["גילוי סקרנות ועניין בלמידה","רוחב אופקים וחתירה לידע","הסתמכות על ידע מבוסס נתונים","שאיפה למצוינות ולמיצוי יכולות אישיות"]},{"n":"מחויבות לערכי מדינת ישראל כמדינה יהודית ודמוקרטית","a":["היכרות ומחויבות לערכים יהודיים ודמוקרטיים ברוח מגילת העצמאות","כיבוד סמלי המדינה ושמירת החוק","שירות משמעותי (צבאי, לאומי, אזרחי)","השתתפות בתהליכים דמוקרטיים בחברה"]},{"n":"כיבוד ערכי המורשת והתרבות במדינת ישראל","a":["מחויבות לערכי המורשת והזהות התרבותית של התלמיד","היכרות וכבוד למגוון תרבויות ומורשות במדינה"]},{"n":"צדק חברתי וערבות הדדית","a":["יושרה והגינות","סולידריות ועזרה לזולת","מעורבות חברתית ואזרחית","מחויבות לטבע וקידום צדק סביבתי"]},{"n":"כבוד האדם והמשפחה","a":["כבוד לאדם ושמירה על זכויות היסוד","שמירה על ערך חיי אדם","כיבוד ההורים והמעגל המשפחתי"]}]},{"c":"כשירויות משלימות","s":[{"n":"אוריינות פיננסית","a":["הבנת מושגים כלכליים","ניהול תקציב וחיסכון","צריכה מושכלת","הבנת אשראי, חוב והשקעה"]},{"n":"יזמות וחדשנות","a":["זיהוי הזדמנויות וצרכים","פיתוח רעיון","גיוס משאבים ושותפים","עמידה בסיכון ובכישלון","בחינת הערך שנוצר"]},{"n":"חשיבה מחשובית","a":["פירוק בעיה","זיהוי דפוסים","הפשטה","ניסוח אלגוריתם"]},{"n":"אוריינות לפיתוח בר קיימא","a":["הבנת הקשרים בין אדם, חברה וסביבה","הערכת השלכות לטווח ארוך","אורח חיים מקיים","פעולה לפתרון אתגרים סביבתיים"]},{"n":"יצירת ערך חדש","a":["חידוש","פעולה יזמית","בחינת הערך שנוצר","יצירה משותפת"]},{"n":"יישוב מתחים ודילמות","a":["זיהוי צרכים וערכים סותרים","הבנת נקודות מבט שונות","שקילת השלכות לטווח הקצר והארוך","גיבוש פתרון מאוזן"]},{"n":"לקיחת אחריות","a":["שקילת השלכות עתידיות","הערכת סיכונים ותועלות","קבלת אחריות על התוצאות","תיקון והפקת לקחים"]},{"n":"חשיבה מערכתית","a":["זיהוי רכיבים במערכת","זיהוי קשרים ולולאות משוב","חיזוי השפעת שינוי","שיפור שיטתי של מערכת"]},{"n":"חשיבת עתיד","a":["זיהוי מגמות ושינויים","דמיון עתידים אפשריים","עיצוב עתיד רצוי וישים","היערכות מוקדמת"]},{"n":"פעלנות (Agency)","a":["קביעת מטרות","יוזמה","פעולה עצמאית ואחראית","חולל שינוי"]},{"n":"הקשבה","a":["קשב וזכירה","הבנת כוונה ותיעוד","הקשבה פעילה","הקשבה ביקורתית"]},{"n":"פתרון בעיות","a":["ביצוע הנחיות ובקשת עזרה","יצירת חלופות והערכתן","חקירת סיבות ודפוסים","הסקה לוגית ובדיקת השערות","תכנון אסטרטגי ולמידה מתמשכת"]},{"n":"תכנון","a":["הגדרת הצלחה והכרת חוזקות","הצבת מטרות","תעדוף והקצאת משאבים","תכנון עם יעדי מדידה ומשוב","תכנון גמיש"]},{"n":"מנהיגות","a":["הבנת רגשות","ארגון משימות ותפקידים","הנחיית דיון וקבלת החלטות משותפת","תמיכה, אימון והנעה של אחרים","הובלה מותאמת"]},{"n":"מטה-קוגניציה","a":["מודעות לאופן הלמידה","תכנון הלמידה","ניטור הבנה תוך כדי","הערכה ושיפור אסטרטגיות"]},{"n":"אופטימיות","a":["ציפייה לתוצאות חיוביות","ראיית קושי כזמני ובר השפעה","חשיבה חיובית ודיבור עצמי חיובי","הוקרת תודה"]},{"n":"תודעת צמיחה (Growth mindset)","a":["אמונה בהתפתחות היכולות","למידה מטעויות","קבלת אתגרים והתמדה","קבלת משוב לשיפור"]},{"n":"סובלנות לעמימות","a":["פעולה במצב של חוסר ודאות","השהיית מסקנות","קבלת החלטות במצבים סותרים","שמירה על שקט מול מורכבות"]},{"n":"אמון","a":["נכונות להאמין באחרים","בניית אמון","שימור ותיקון אמון"]},{"n":"סובלנות","a":["פתיחות לשונה","קבלת זכות האחר","מחלוקת מכבדת"]},{"n":"שוויון","a":["הכרה בערך שווה","שוויון הזדמנויות","שוויון מגדרי","פעולה נגד הפליה"]},{"n":"חשיבה אנליטית","a":["פירוק מצב מורכב","זיהוי דפוסים וקשרים","הבחנה בין סיבה לתוצאה","הסקת מסקנות מנתונים"]},{"n":"חוסן, גמישות וזמישות","a":["התאוששות מקושי וכישלון","הסתגלות לשינוי","שינוי כיוון מהיר"]},{"n":"תכלית","a":["זיהוי מה משמעותי עבורי","גיבוש כיוון ומטרה","חיבור פעולות יומיומיות למטרה רחבה"]},{"n":"ביטוי עצמי","a":["מתן קול לרעיונות","ביטוי רגשות","ביטוי זהות באמצעים מגוונים","כבוד לזכות להישמע"]},{"n":"אומץ ונחישות","a":["פעולה לפי ערכים מול פחד","עמידה מאחורי החלטה","אומץ אינטלקטואלי","אומץ חברתי ומוסרי"]},{"n":"אותנטיות וכנות","a":["התנהלות התואמת את עמדותיי","אמירת אמת לעצמי","אמירת אמת לאחרים"]},{"n":"ביטחון ויציבות","a":["ביטחון אישי ורגשי","ביטחון חברתי ושייכות","סביבה יציבה וצפויה","ביטחון עצמי והעזה"]},{"n":"הוקרת תודה","a":["זיהוי הטוב","זיהוי תרומת אחרים","הבעת תודה"]},{"n":"חופש ובחירה","a":["בחירת דרך ועמדות","אחריות על הבחירה","כבוד לבחירות של אחרים"]},{"n":"אוריינות בינה מלאכותית","a":["זיהוי מנגנונים ואופן פעולה","שימוש יעיל ומושכל","שימוש יוזם ויוצר ערך (פעלנות)","תפקוד אתי"]},{"n":"מוסר","a":["עקרונות של טוב וצדק","שיקול דעת מוסרי","אחריות כלפי הזולת","עמידה בעקרונות מול קיצורי דרך"]},{"n":"שקיפות","a":["גילוי אופן קבלת החלטות","גילוי אופן יצירת תוצרים","אפשרות לבדיקה ולאמון"]},{"n":"פרטיות","a":["שליטה במידע אישי","שמירה על מידע אישי שלי","שמירה על מידע של אחרים","פרטיות בעבודה עם בינה מלאכותית"]}]}];
+var PRESET = (new URLSearchParams(location.search).get('table') || '').replace(/\D/g, '').slice(0, 2);
+var HIDDEN = ['מבין','מבינה','יבין','הבנה','יודע','יודעת','ידע','מודע','מודעת','מודעות','מעריך','מעריכה','מכיר','מכירה','לומד','לומדת','חושב','חושבת','מרגיש','מרגישה','מפנים','מפנימה','רוצה','אוהב','אוהבת','מתעניין','מתעניינת','מסוגל','מסוגלת','שולט','שולטת','זוכר','זוכרת','מאמין','מקבל','מכבד'];
+function $(id) { return document.getElementById(id); }
+var IDS = ['table','group','skill','ability','abilityOther','def','l1','l2','l3','l4','tfrom','tmove'];
+
+if (!window.WALL_API) document.getElementById('notset').hidden = false;
+(function init() {
+  for (var i = 1; i <= 20; i++) { var o = document.createElement('option'); o.value = o.textContent = String(i); $('table').appendChild(o); }
+  SKILLS.forEach(function (c) {
+    var g = document.createElement('optgroup'); g.label = c.c;
+    c.s.forEach(function (s) { var o = document.createElement('option'); o.value = o.textContent = s.n; g.appendChild(o); });
+    $('skill').appendChild(g);
+  });
+  $('skill').addEventListener('change', fillAbilities);
+  $('ability').addEventListener('change', function () { $('abilityOtherWrap').hidden = $('ability').value !== '__other'; });
+  ['l1','l2','l3','l4'].forEach(function (id) { $(id).addEventListener('input', function () { cam(id); }); });
+  try {
+    var saved = JSON.parse(localStorage.getItem('flightplan-draft') || 'null');
+    if (saved) IDS.forEach(function (k) { if (saved[k] != null && k !== 'ability') $(k).value = saved[k]; });
+    if (saved && saved.skill) { fillAbilities(); $('ability').value = saved.ability || ''; $('abilityOtherWrap').hidden = $('ability').value !== '__other'; }
+  } catch (e) {}
+  if (PRESET) { $('table').value = PRESET; }
+  document.addEventListener('input', saveDraft);
+  document.addEventListener('change', saveDraft);
+})();
+
+function fillAbilities() {
+  var sel = $('ability'); sel.innerHTML = '';
+  var name = $('skill').value, found = null;
+  SKILLS.forEach(function (c) { c.s.forEach(function (s) { if (s.n === name) found = s; }); });
+  var first = document.createElement('option'); first.value = ''; first.textContent = found ? 'בחרו יכולת' : 'בחרו קודם מיומנות'; sel.appendChild(first);
+  if (found) found.a.forEach(function (a) { var o = document.createElement('option'); o.value = o.textContent = a; sel.appendChild(o); });
+  var other = document.createElement('option'); other.value = '__other'; other.textContent = 'ניסוח שלנו'; if (found) sel.appendChild(other);
+  sel.disabled = !found;
+  $('abilityOtherWrap').hidden = true;
+}
+function cam(id) {
+  var v = $(id).value, out = document.querySelector('.cam[data-for="' + id + '"]');
+  var words = v.replace(/[.,:;!?"׳״'()]/g, ' ').split(/\s+/);
+  var hit = words.filter(function (w) { return HIDDEN.indexOf(w.replace(/^[והשבלכמ](?=\S{3,})/, '')) > -1 || HIDDEN.indexOf(w) > -1; });
+  out.textContent = hit.length ? 'מבחן המצלמה: מצלמה לא תקלוט "' + hit[0] + '". מה רואים או שומעים?' : '';
+}
+function saveDraft() { try { var o = {}; IDS.forEach(function (k) { o[k] = $(k).value; }); localStorage.setItem('flightplan-draft', JSON.stringify(o)); } catch (e) {} }
+function val(id) { var v = $(id).value.trim(); return v === 'אני' ? '' : v; }
+
+$('send').addEventListener('click', function () {
+  var err = $('err'); err.hidden = true;
+  var ability = $('ability').value === '__other' ? val('abilityOther') : $('ability').value;
+  var d = { table: $('table').value, group: val('group'), skill: $('skill').value, ability: ability, def: val('def'),
+    l1: val('l1'), l2: val('l2'), l3: val('l3'), l4: val('l4'), tfrom: $('tfrom').value, tmove: val('tmove') };
+  var miss = [];
+  if (!d.table) miss.push('מספר שולחן');
+  if (!d.skill) miss.push('מיומנות');
+  if (!d.l1 && !d.l2 && !d.l3 && !d.l4) miss.push('לפחות רמה אחת');
+  if (miss.length) { err.textContent = 'חסר: ' + miss.join(', '); err.hidden = false; return; }
+  var b = $('send'); b.disabled = true; b.textContent = 'שולחים...';
+  function reset() { b.disabled = false; b.textContent = 'שולחים למגדל הפיקוח ✈'; }
+  if (!window.WALL_API) { reset(); err.textContent = 'הטופס עוד לא מחובר לגיליון.'; err.hidden = false; return; }
+  fetch(window.WALL_API, { method: 'POST', body: JSON.stringify(d) })
+    .then(function (r) { return r.json(); })
+    .then(function (res) {
+      reset();
+      if (!res || !res.ok) throw new Error(res && res.error || 'נסו שוב');
+      $('formView').hidden = true; $('doneView').hidden = false; window.scrollTo(0, 0);
+    })
+    .catch(function (e) { reset(); err.textContent = 'השליחה לא הצליחה: ' + (e && e.message ? e.message : 'נסו שוב'); err.hidden = false; });
+});
+$('edit').addEventListener('click', function () { $('doneView').hidden = true; $('formView').hidden = false; });
+</script>
+</body>
+</html>
