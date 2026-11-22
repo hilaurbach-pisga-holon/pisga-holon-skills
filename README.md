@@ -1,6 +1,8 @@
 # מרכז המיומנויות – הבוגרת והבוגר 2030
 
-קישור לאתר החי: https://pisga-holon-skills.sites.tab.bot/
+קישור לאתר ב-GitHub Pages: https://hilaurbachtab-10.github.io/pisga-holon-skills/
+
+(הגרסה הישנה ב-sites.tab.bot לא מתעדכנת מ-GitHub.)
 
 אתר להוראת מיומנויות: דפי מיומנות, פעילויות, משימות וחדרי בריחה.
 
