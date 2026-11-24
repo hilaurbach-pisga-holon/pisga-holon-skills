@@ -194,7 +194,7 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
       <h1>מחשב המסלול</h1>
       <p class="kicker">מרכז הל"ה למיומנויות: הוראה, למידה, הערכה · פסג"ה חולון</p>
     </div>
-    <a class="home" href="https://hilaurbachtab-10.github.io/pisga-holon-skills/">לאתר המרכז ←</a>
+    <a class="home" href="https://hilaurbach-pisga-holon.github.io/pisga-holon-skills/">לאתר המרכז ←</a>
   </header>
 
   <section class="card" aria-label="בחירת יעד">
@@ -273,7 +273,7 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
 (function () {
   document.documentElement.setAttribute('dir', 'rtl');
   document.documentElement.setAttribute('lang', 'he');
-  var BASE = 'https://hilaurbachtab-10.github.io/pisga-holon-skills/';
+  var BASE = 'https://hilaurbach-pisga-holon.github.io/pisga-holon-skills/';
   var D = JSON.parse(document.getElementById('data').textContent);
   var LEVELS = ['מתחיל', 'מתפתח', 'מיומן', 'מוביל'];
   var LADN = ['מתחיל', 'מתפתח', 'מיומן', 'מוביל'];
@@ -548,7 +548,7 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
     try { navigator.clipboard.writeText(text).then(function () { fb.hidden = true; flash(ok); }, fallback); } catch (e) { fallback(); }
   }
   $('copyBtn').addEventListener('click', function () { copy(routeText(), 'המסלול הועתק'); });
-  $('linkBtn').addEventListener('click', function () { copy((/^https?:/.test(location.protocol) && location.hostname.indexOf('claude') === -1 ? location.origin + location.pathname : 'https://hilaurbachtab-10.github.io/pisga-holon-skills/route.html') + '#' + state.ab, 'הקישור הועתק'); });
+  $('linkBtn').addEventListener('click', function () { copy((/^https?:/.test(location.protocol) && location.hostname.indexOf('claude') === -1 ? location.origin + location.pathname : 'https://hilaurbach-pisga-holon.github.io/pisga-holon-skills/route.html') + '#' + state.ab, 'הקישור הועתק'); });
   $('resetBtn').addEventListener('click', function () { state.here = -1; renderRoute(); renderEta(); flash('המסלול חושב מחדש'); });
 
   var HIDDEN = ['מבין', 'מבינה', 'יבין', 'הבנה', 'יודע', 'יודעת', 'ידע', 'מודע', 'מודעת', 'מודעות', 'מעריך', 'מעריכה', 'מכיר', 'מכירה', 'לומד', 'לומדת', 'חושב', 'חושבת', 'מרגיש', 'מרגישה', 'מפנים', 'מפנימה', 'רוצה', 'אוהב', 'אוהבת', 'מתעניין', 'מתעניינת', 'מסוגל', 'מסוגלת', 'שולט', 'שולטת', 'זוכר', 'זוכרת', 'מאמין', 'מקבל', 'מכבד'];

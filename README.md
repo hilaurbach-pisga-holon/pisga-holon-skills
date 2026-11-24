@@ -1,6 +1,6 @@
 # מרכז המיומנויות – הבוגרת והבוגר 2030
 
-קישור לאתר ב-GitHub Pages: https://hilaurbachtab-10.github.io/pisga-holon-skills/
+קישור לאתר ב-GitHub Pages: https://hilaurbach-pisga-holon.github.io/pisga-holon-skills/
 
 (הגרסה הישנה ב-sites.tab.bot לא מתעדכנת מ-GitHub.)
 
