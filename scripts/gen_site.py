@@ -94,7 +94,7 @@ HEAD_TAIL = base[base.index('<link rel="icon"'):base.index('</head>')]
 header = base[base.index('<body'):base.index('<main id="main">')]
 header = header[header.index('>') + 1:]
 NAV = [('index.html', 'דף הבית'), ('skills.html', 'כל המיומנויות'), ('route.html', 'מחשב המסלול'),
-       ('activities.html', 'פעילויות לכיתה'), ('rubric.html', 'המדרג המלא'), ('workshop.html', 'סדנה ומשאבים')]
+       ('activities.html', 'פעילויות לכיתה'), ('rubric.html', 'המדרג המלא'), ('workshop.html', 'סדנה ומשאבים'), ('contact.html', 'כתבו לנו')]
 def nav_html(cur):
     return '<nav class="wrap main-nav" aria-label="ניווט ראשי"><ul>' + ''.join(
         '<li><a href="%s"%s>%s</a></li>' % (h, ' aria-current="page"' if h == cur else '', t) for h, t in NAV) + '</ul></nav>'
@@ -108,17 +108,22 @@ FOOTER = '''<footer class="site-footer">
   <p class="muted updated">עודכן לאחרונה: %s</p>
  </div>
 </footer>''' % UPDATED
-FOOT_RE = re.compile(r'<footer class="site-footer">.*?</footer>', re.S)
+FOOTER_PLAIN = FOOTER
+ASK = ('<section class="ask-strip" aria-labelledby="ask-h"><div class="wrap ask-in"><div><h2 id="ask-h">אנחנו כאן לרשותכם</h2>'
+       '<p>צריכים משהו להוראה יעילה ולא מצאתם? פעילות, כלי הערכה, ליווי לצוות או רעיון לשיעור: כתבו לנו ונחזור אליכם.</p></div>'
+       '<a class="btn" href="contact.html">כתבו לנו</a></div></section>\n')
+FOOTER = ASK + FOOTER_PLAIN
+FOOT_RE = re.compile(r'(?:<section class="ask-strip".*?</section>\n)?<footer class="site-footer">.*?</footer>', re.S)
 TAIL = '\n<script src="script.js"></script>\n</body>\n</html>\n'
 
-def page(name, title, desc, body, bodycls='core-page'):
+def page(name, title, desc, body, bodycls='core-page', foot=None):
     h = NAV_RE.sub(nav_html(name), header)
     out = ('<!doctype html>\n<html lang="he" dir="rtl">\n<head>\n<meta charset="utf-8">\n'
            '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
            '<title>%s</title>\n<meta name="description" content="%s">\n'
            '<meta property="og:title" content="%s">\n<meta property="og:description" content="%s">\n%s</head>\n'
            '<body class="%s">\n%s<main id="main">\n%s\n</main>\n%s%s') % (
-        E(title), E(desc), E(title), E(desc), HEAD_TAIL, bodycls, h, body, FOOTER, TAIL)
+        E(title), E(desc), E(title), E(desc), HEAD_TAIL, bodycls, h, body, foot or FOOTER, TAIL)
     open(name, 'w', encoding='utf-8').write(out)
 
 def src_line(s):
@@ -194,6 +199,7 @@ for idx, s in enumerate(ITEMS):
         '<section class="wrap block"><h2>ה%s: ארבע רמות ואיך עוברים</h2><div class="ab-list">%s</div></section>%s</div>'
     ) % (sty, s['cat'], CATSHORT[s['cat']], E(s['grp']), core_flag, E(s['t']), s['id'], E(s['n']), E(s['d']), src_line(s),
          sty, NOTE % u, len(s['ab']), u, toc, s['id'], tgt_rows, u, kit, core_intro, u, abs_html, pn)
+    body += ('<section class="wrap block"><p class="ask-inline">חסר לכם משהו ב%s? <a href="contact.html?item=%s">כתבו לנו מה צריך</a> ונחזור אליכם.</p></section>' % (E(s['n']), s['id']))
     page(fn(s['id']), '%s | מרכז הל"ה למיומנויות' % s['n'],
          '%s: הגדרה, %d %s, ארבע רמות, איך עוברים מרמה לרמה ופעילויות לכיתה.' % (s['n'], len(s['ab']), u), body)
 
@@ -373,6 +379,102 @@ hub = (
 page('skills.html', 'כל המיומנויות | מרכז הל"ה למיומנויות',
      'כל 52 המיומנויות, הערכים והכשירויות המשלימות, עם 200 יכולות, ארבע רמות לכל יכולת, איך עוברים מרמה לרמה ופעילויות לכיתה.', hub)
 
+# ---------- contact page ----------
+item_opts = ''.join('<option value="%s">%s</option>' % (E(s['n']), E(s['n'])) for s in ITEMS)
+core_opts2 = ''.join('<option value="%s">%s (ליבה בחולון)</option>' % (E(SK[c]['n']), E(SK[c]['n'])) for c in CORE)
+item_ids = json.dumps({s['id']: s['n'] for s in ITEMS}, ensure_ascii=False)
+contact = '''<section class="fam-hero" style="--fam:#29275E;--fam-d:#29275E;--fam-l:#ECEBF5"><div class="wrap">
+<p class="eyebrow">מרכז הל"ה למיומנויות</p><h1>כתבו לנו</h1>
+<p class="lead">אנחנו כאן לרשותכם. צריכים משהו להוראה יעילה ולא מצאתם באתר? פעילות למיומנות מסוימת, כלי הערכה, ליווי לצוות או סדנה: ספרו לנו מה צריך ונחזור אליכם.</p></div></section>
+<section class="wrap block contact-wrap">
+<form id="cform" class="cform" novalidate>
+ <div id="formView">
+ <fieldset><legend>מה אתם צריכים?</legend>
+  <label for="c-kind">סוג הפנייה</label>
+  <select id="c-kind" name="kind"><option>חומר או פעילות להוראה</option><option>כלי הערכה</option><option>ליווי לצוות או סדנה</option><option>שאלה על האתר</option><option>הצעה או משוב</option><option>אחר</option></select>
+  <label for="c-item">מיומנות, ערך או כשירות <span class="opt">(לא חובה)</span></label>
+  <select id="c-item" name="item"><option value="">כללי, לא מיומנות מסוימת</option><optgroup label="מיומנויות הליבה של חולון">%s</optgroup><optgroup label="כל המיומנויות, הערכים והכשירויות">%s</optgroup></select>
+  <label for="c-grade">שכבת גיל <span class="opt">(לא חובה)</span></label>
+  <select id="c-grade" name="grade"><option value="">לא רלוונטי</option><option>גן–ב׳</option><option>ג׳–ו׳</option><option>ז׳–ט׳</option><option>י׳–י״ב</option><option>צוות מורים</option></select>
+  <label for="c-msg">מה הייתם רוצים? <span class="req">*</span></label>
+  <textarea id="c-msg" name="msg" rows="6" maxlength="2000" placeholder="למשל: פעילות קצרה לעבודת צוות בכיתה ז׳, שאפשר לשלב בשיעור מדעים"></textarea>
+ </fieldset>
+ <fieldset><legend>איך נחזור אליכם?</legend>
+  <div class="row2">
+   <div><label for="c-name">שם מלא <span class="req">*</span></label><input id="c-name" name="name" autocomplete="name" maxlength="80"></div>
+   <div><label for="c-role">תפקיד</label><input id="c-role" name="role" maxlength="80" placeholder="מורה, רכזת, מנהל..."></div>
+  </div>
+  <label for="c-school">בית ספר או גן</label><input id="c-school" name="school" maxlength="120" autocomplete="organization">
+  <div class="row2">
+   <div><label for="c-email">דוא"ל</label><input id="c-email" name="email" type="email" autocomplete="email" dir="ltr" maxlength="120"></div>
+   <div><label for="c-phone">טלפון</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" dir="ltr" maxlength="30"></div>
+  </div>
+  <p class="opt">צריך לפחות דוא"ל או טלפון.</p>
+  <label class="chk"><input id="c-ok" type="checkbox"> אני מסכים/ה שצוות מרכז הל"ה ייצור איתי קשר בעניין הפנייה <span class="req">*</span></label>
+  <div class="hp" aria-hidden="true"><label for="c-web">אתר</label><input id="c-web" name="website" tabindex="-1" autocomplete="off"></div>
+ </fieldset>
+ <p id="c-err" class="c-err" role="alert" hidden></p>
+ <button id="c-send" type="submit" class="btn">שליחה</button>
+ </div>
+ <div id="doneView" class="c-done" hidden><h2>תודה, הפנייה התקבלה</h2><p>נחזור אליכם בהקדם. אפשר להמשיך <a href="skills.html">לכל המיומנויות</a> או <a href="activities.html">לפעילויות לכיתה</a>.</p>
+  <button id="c-again" type="button" class="btn ghost">פנייה נוספת</button></div>
+ <div id="mailView" class="c-done" hidden><h2>נפתחה הודעת דוא"ל</h2><p>הפנייה הוכנה בתוכנת הדוא"ל שלכם, ונשאר ללחוץ "שלח". אם לא נפתח דבר, אפשר לכתוב ישירות ל<span id="c-addr" dir="ltr"></span>.</p></div>
+</form>
+<aside class="contact-side">
+ <h2>אפשר גם כך</h2>
+ <p>טלפון: <a href="tel:+97237444703" dir="ltr">03-7444703</a></p>
+ <p>וואטסאפ: <a href="https://wa.me/972553072407" target="_blank" rel="noopener" dir="ltr">055-3072407</a></p>
+ <p>דוא"ל: <a id="c-mail" href="mailto:Secretary@pisga.org" dir="ltr">Secretary@pisga.org</a></p>
+ <p class="muted">פסג"ה חולון · שדרות ירושלים 101, חולון</p>
+</aside>
+</section>
+<script src="contact-config.js"></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var ITEMS=%s;
+var cfg=window.CONTACT||{};
+if(cfg.email){$('c-mail').href='mailto:'+cfg.email;$('c-mail').textContent=cfg.email;}
+try{var q=new URLSearchParams(location.search).get('item');if(q&&ITEMS[q]){$('c-item').value=ITEMS[q];}}catch(e){}
+function v(i){return ($(i).value||'').trim();}
+$('cform').addEventListener('submit',function(ev){
+ ev.preventDefault();
+ var err=$('c-err');err.hidden=true;
+ var d={kind:v('c-kind'),item:v('c-item'),grade:v('c-grade'),msg:v('c-msg'),name:v('c-name'),role:v('c-role'),school:v('c-school'),email:v('c-email'),phone:v('c-phone'),website:v('c-web'),page:document.referrer||''};
+ var miss=[];
+ if(!d.msg)miss.push('מה הייתם רוצים');
+ if(!d.name)miss.push('שם');
+ if(!d.email&&!d.phone)miss.push('דוא"ל או טלפון');
+ if(d.email&&!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(d.email))miss.push('דוא"ל תקין');
+ if(!$('c-ok').checked)miss.push('הסכמה ליצירת קשר');
+ if(miss.length){err.textContent='חסר: '+miss.join(', ');err.hidden=false;return;}
+ var b=$('c-send');
+ if(!cfg.api){
+  var to=cfg.email||'Secretary@pisga.org';
+  var body=['סוג הפנייה: '+d.kind,'מיומנות: '+(d.item||'כללי'),'שכבה: '+(d.grade||'-'),'','הפנייה:',d.msg,'','שם: '+d.name,'תפקיד: '+d.role,'בית ספר: '+d.school,'דוא"ל: '+d.email,'טלפון: '+d.phone].join('\\n');
+  $('c-addr').textContent=to;
+  location.href='mailto:'+to+'?subject='+encodeURIComponent('פנייה לאתר מרכז הל"ה: '+d.kind)+'&body='+encodeURIComponent(body);
+  $('formView').hidden=true;$('mailView').hidden=false;return;
+ }
+ b.disabled=true;b.textContent='שולחים...';
+ fetch(cfg.api,{method:'POST',body:JSON.stringify(d)}).then(function(r){return r.json();}).then(function(res){
+  b.disabled=false;b.textContent='שליחה';
+  if(!res||!res.ok)throw new Error(res&&res.error||'נסו שוב');
+  $('formView').hidden=true;$('doneView').hidden=false;window.scrollTo(0,0);
+ }).catch(function(e){b.disabled=false;b.textContent='שליחה';err.textContent='השליחה לא הצליחה ('+(e&&e.message?e.message:'נסו שוב')+'). אפשר גם להתקשר או לכתוב לנו בדוא"ל.';err.hidden=false;});
+});
+$('c-again').addEventListener('click',function(){$('cform').reset();$('doneView').hidden=true;$('formView').hidden=false;});
+})();
+</script>''' % (core_opts2, item_opts, item_ids)
+page('contact.html', 'כתבו לנו | מרכז הל"ה למיומנויות',
+     'צריכים משהו להוראה יעילה ולא מצאתם? כתבו לצוות מרכז הל"ה למיומנויות ונחזור אליכם.', contact, foot=FOOTER_PLAIN)
+if not os.path.exists('contact-config.js'):
+    open('contact-config.js', 'w', encoding='utf-8').write(
+        "// טופס \"כתבו לנו\"\n"
+        "// api: כתובת ה-exec של Apps Script בגיליון הפניות (פריסה כאפליקציית אינטרנט, גישה: כל אחד).\n"
+        "//      כל עוד היא ריקה, הטופס פותח הודעת דוא\"ל מוכנה לכתובת שבשדה email.\n"
+        "window.CONTACT = {\n  api: '',\n  email: 'Secretary@pisga.org'\n};\n")
+
 # ---------- home ----------
 old = open('index.html', encoding='utf-8').read()
 m = re.search(r'<section class="wrap block escape-block">.*?</section>', old, re.S)
@@ -420,7 +522,7 @@ for f in glob.glob('*.html'):
     if f.startswith(('print-', 'wall')) or f == 'route.html': continue
     t = open(f, encoding='utf-8').read(); t0 = t
     t = NAV_RE.sub(nav_html(f), t)
-    t = FOOT_RE.sub(FOOTER, t)
+    t = FOOT_RE.sub(lambda m: FOOTER_PLAIN if f == 'contact.html' else FOOTER, t)
     t = t.replace('מרכז המיומנויות<small>הבוגרת והבוגר 2030</small>', 'מרכז הל"ה למיומנויות<small>הוראה · למידה · הערכה</small>')
     t = t.replace('זו המסגרת המלאה של משרד החינוך, שממנה נבחרו <a href="index.html#core">שש מיומנויות הליבה</a>.',
                   'זו המסגרת המלאה של משרד החינוך. <a href="skills.html">כל המיומנויות</a>, הערכים והכשירויות, עם רמות ופעילויות, נמצאים בעמוד נפרד.')
@@ -483,6 +585,25 @@ css += CSS_MARK + '''
 .act.fam-core,.fam-h.fam-core{--fam:#E8432E;--fam-d:#A3271A;--fam-l:#FDEBE8}
 .act.fam-vals,.fam-h.fam-vals{--fam:#F08A3C;--fam-d:#A44E14;--fam-l:#FDF0E6}
 .act.fam-comp,.fam-h.fam-comp{--fam:#7B6FD0;--fam-d:#4B3FA0;--fam-l:#EFEDFA}
+.ask-strip{background:#29275E;color:#fff;margin-top:2.5rem}
+.ask-in{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;padding-block:1.6rem}
+.ask-in h2{margin:0 0 .3rem;color:#fff;font-size:1.5rem}.ask-in p{margin:0;max-width:44rem;color:#E3E2F0}
+.ask-strip .btn{background:#F08A3C;border-color:#F08A3C;color:#1D1C3A}.ask-strip .btn:hover{background:#fff;border-color:#fff}
+.ask-inline{background:var(--bg);border-radius:var(--radius);padding:.9rem 1.2rem;margin:0}
+.contact-wrap{display:grid;grid-template-columns:minmax(0,1fr) 18rem;gap:2rem;align-items:start}
+.cform fieldset{border:1px solid var(--line);border-radius:var(--radius);padding:1rem 1.2rem 1.2rem;margin:0 0 1.2rem;display:flex;flex-direction:column;gap:.35rem}
+.cform legend{font-family:"Secular One",sans-serif;font-size:1.2rem;color:var(--navy);padding:0 .4rem}
+.cform label{font-weight:700;color:var(--navy);margin-top:.5rem}
+.cform input,.cform select,.cform textarea{font:inherit;padding:.6rem .8rem;border:1px solid var(--line);border-radius:10px;background:#fff;width:100%;box-sizing:border-box}
+.cform input:focus,.cform select:focus,.cform textarea:focus{outline:3px solid #2E9FD8;outline-offset:1px}
+.cform .row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.cform .chk{display:flex;gap:.5rem;align-items:flex-start;font-weight:400;color:var(--ink)}.cform .chk input{width:auto;margin-top:.3rem}
+.opt{font-weight:400;color:var(--muted);font-size:.88rem;margin:0}.req{color:#C0392B}
+.hp{position:absolute;inset-inline-start:-9999px;width:1px;height:1px;overflow:hidden}
+.c-err{color:#A3271A;background:#FDEBE8;border-radius:10px;padding:.6rem .9rem;margin:0 0 1rem}
+.c-done{background:#EEF7E9;border-radius:var(--radius);padding:1.2rem 1.4rem}
+.contact-side{background:var(--bg);border-radius:var(--radius);padding:1.2rem 1.3rem}.contact-side h2{margin-top:0;font-size:1.25rem}
+@media (max-width:820px){.contact-wrap{grid-template-columns:1fr}.cform .row2{grid-template-columns:1fr}}
 .act.fam-lit{--fam:var(--orange);--fam-d:var(--orange-d);--fam-l:#fdf0e6}
 @media (max-width:980px){.lv-track{grid-template-columns:1fr}.tr{max-width:none;padding:.1rem .8rem}.tr-lab::before{content:"↓ "}}
 @media (max-width:820px){.item-top{grid-template-columns:1fr}}
