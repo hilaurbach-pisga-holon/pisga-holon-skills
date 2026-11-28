@@ -165,7 +165,7 @@ for idx, s in enumerate(ITEMS):
             extra += '<details class="from-rubric"%s><summary>פעילויות לכיתה (%d)</summary><ul class="sub-list">%s</ul></details>' % (
                 ' open' if is_core else '', len(rows), ''.join('<li><a href="%s">%s <span class="muted">· %s</span></a></li>' % (E(h), E(t), E(i)) for h, t, i in rows))
         if lad:
-            extra += '<details class="from-rubric"><summary>מהמדרג של המרכז: %d תת-מיומנויות עם כלים</summary><ul class="sub-list">%s</ul></details>' % (len(a['lad']), lad)
+            extra += '<details class="from-rubric"><summary>מהמדרג של המרכז: %s עם כלים</summary><ul class="sub-list">%s</ul></details>' % ('תת-מיומנות אחת' if len(a['lad']) == 1 else '%d תת-מיומנויות' % len(a['lad']), lad)
         meta = []
         if a.get('g'): meta.append(E(a['g']))
         if a.get('s20'): meta.append('חלק מ"הלומד העצמאי"')
@@ -327,7 +327,7 @@ for s in ITEMS:
     s.pop('cat', None); s.pop('grp', None)
     for a in s['ab']: a.pop('item', None)
 route = route[:DM.start(2)] + json.dumps(D, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/') + route[DM.end(2):]
-if 'var xa = a.xa' not in route:
+if 'פעילויות לכיתה ליכולת הזו:' not in route:
     route = route.replace("if (!ids.length && !sids.length) { c.hidden = true; return; }",
                           "var xa = a.xa || [];\n    if (!ids.length && !sids.length && !xa.length) { c.hidden = true; return; }")
     route = route.replace("    if (ids.length) {\n      c.appendChild(el('div', 'grp-h', 'ליכולת \"' + a.n + '\"'));",
@@ -533,6 +533,42 @@ for f in glob.glob('print-*.html'):
     t = open(f, encoding='utf-8').read()
     t2 = re.sub(r'href="(core-[a-z]+|steps)\.html[^"]*"', 'href="index.html#core"', t)
     if t2 != t: open(f, 'w', encoding='utf-8').write(t2)
+
+
+# ---------- full rubric: ladders written for the rest of the items (L-<ability id>) ----------
+RFAM = {'S': ('other', 'שאר המיומנויות'), 'V': ('val', 'ערכים'), 'C': ('comp', 'כשירויות משלימות')}
+OLD_SKILL = {'S13': 'HLTH'}
+rub = open('rubric.html', encoding='utf-8').read()
+rub = re.sub(r'<!--ALL-LAD-->.*?<!--/ALL-LAD-->', '', rub, flags=re.S)
+rub = re.sub(r'<!--ALL-LAD-OPT-->.*?<!--/ALL-LAD-OPT-->', '', rub, flags=re.S)
+arts, opts, seen = [], [], set()
+for s in ITEMS:
+    fam, famn = RFAM[s['cat']]
+    skc = OLD_SKILL.get(s['id'], s['id'])
+    for a in s['ab']:
+        for lid in a.get('lad', []):
+            if not lid.startswith('L-') or lid not in LAD: continue
+            L = LAD[lid]
+            if skc not in seen and skc != 'HLTH':
+                seen.add(skc); opts.append('<option value="%s" data-fam="%s">%s</option>' % (skc, fam, E(s['n'])))
+            st = ''.join('<li class="st st%d"><span class="st-name">%d · %s</span><span class="st-text">%s</span></li>' % (i + 1, i + 1, LEVELS[i], E(x)) for i, x in enumerate(L['stages']))
+            tl = ''.join('<li><span class="tool-step">משלב %d לשלב %d</span><span>%s</span></li>' % (i + 1, i + 2, E(x)) for i, x in enumerate(L['tools']))
+            arts.append('<article class="sub fam-%s" id="%s" data-fam="%s" data-skill="%s" data-draft="1">\n'
+                '<p class="crumbs">%s › <a href="%s#%s">%s</a> › <span class="code">%s</span> %s</p>\n<h3>%s</h3>\n'
+                '<p class="def"><strong>מה זה:</strong> %s</p>\n<h4>איך זה נראה בכיתה – ארבעת השלבים</h4>\n<ol class="stages">%s</ol>\n'
+                '<h4>כלים לקידום <span class="muted">· 5–15 דקות בתוך שיעור רגיל</span></h4>\n<ul class="tools">%s</ul>\n'
+                '<p class="find"><a href="route.html#%s">פתיחה במחשב המסלול</a></p>\n</article>' % (
+                fam, lid, fam, skc, famn, fn(s['id']), a['id'], E(s['n']), a['id'], E(a['n']), E(L['title']), E(L['def']), st, tl, a['id']))
+i = rub.rfind('</article></div>')
+rub = rub[:i + len('</article>')] + '<!--ALL-LAD-->' + ''.join(arts) + '<!--/ALL-LAD-->' + rub[i + len('</article>'):]
+rub = rub.replace('<option value="other">שאר המיומנויות</option>', '<option value="other">שאר המיומנויות</option><option value="val">ערכים</option><option value="comp">כשירויות משלימות</option>', 1) if 'value="val"' not in rub else rub
+i = rub.find('</select></label>', rub.find('id="f-skill"'))
+rub = rub[:i] + '<!--ALL-LAD-OPT-->' + ''.join(opts) + '<!--/ALL-LAD-OPT-->' + rub[i:]
+rub = re.sub(r'<p class="lead">כל <span data-count="total">.*?</p>',
+    '<p class="lead">כל <span data-count="total">%d</span> תתי-המיומנויות והרכיבים במקום אחד: <span data-count="team">76</span> בשלוש המשפחות שיש להן מדרג מלא, <span data-count="starter">%d</span> בשאר המיומנויות, ועוד %d בערכים ו-%d בכשירויות המשלימות. מחפשים מילה, מסננים לפי משפחה ומיומנות, או מציגים שלב אחד בלבד כדי לראות "מה רואים בכיתה" בשלב הזה.</p>' % (
+    rub.count('<article class="sub '), rub.count('data-fam="other" data-skill'), rub.count('data-fam="val" data-skill'), rub.count('data-fam="comp" data-skill')), rub, count=1, flags=re.S)
+rub = re.sub(r'מוצגות \d+ מתוך \d+ תתי-מיומנויות', 'מוצגות %d מתוך %d תתי-מיומנויות' % ((rub.count('<article class="sub '),) * 2), rub, count=1)
+open('rubric.html', 'w', encoding='utf-8').write(rub)
 
 # ---------- css ----------
 CSS_MARK = '/* === all-skills (gen_all) === */'
