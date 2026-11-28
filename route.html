@@ -129,7 +129,37 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 .badge.done { background: var(--line); color: var(--muted); }
 .badge.goal { background: var(--dest); color: #FFFFFF; }
 .badge.band { background: var(--dest-soft); color: var(--dest); }
-.here-btn { align-self: flex-start; font: inherit; font-size: 13px; font-weight: 700; color: var(--here); background: var(--here-soft); border: 0; border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+.here-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 14px; font-weight: 800; color: var(--here); background: var(--surface); border: 2px solid var(--here); border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+.here-btn:hover { background: var(--here-soft); }
+.here-btn.on { background: var(--here); color: #FFFFFF; }
+.here-btn svg { width: 16px; height: 16px; flex: none; }
+.route.picking .here-btn { animation: nudge 1.8s ease-in-out infinite; }
+@keyframes nudge { 0%, 100% { box-shadow: 0 0 0 0 rgba(15,138,122,0); } 50% { box-shadow: 0 0 0 6px rgba(15,138,122,.22); } }
+.guide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.gstep { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start; border: 2px solid transparent; }
+.gstep .gn { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--route-soft); color: var(--route); font-weight: 900; display: grid; place-items: center; font-size: 14px; }
+.gstep b { display: block; font-size: 14px; line-height: 1.3; }
+.gstep span.s { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.35; margin-top: 2px; }
+.gstep.now { border-color: var(--way); }
+.gstep.now .gn { background: var(--way); color: var(--ink); }
+.gstep.done .gn { background: var(--here); color: #FFFFFF; }
+.callout { background: var(--way-soft); border: 2px dashed var(--way); border-radius: 18px; padding: 12px 16px; font-size: 15px; font-weight: 700; line-height: 1.45; display: flex; gap: 10px; align-items: flex-start; }
+.callout svg { width: 22px; height: 22px; flex: none; margin-top: 1px; }
+.callout[hidden] { display: none; }
+.editbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.mini-btn { font: inherit; font-size: 13px; font-weight: 800; border-radius: 999px; padding: 7px 13px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.mini-btn:hover { border-color: var(--route); }
+.mini-btn[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.tag.team { background: var(--way); color: #13223F; }
+.help { font-size: 13px; color: var(--muted); line-height: 1.5; margin: 0; }
+.help b { color: var(--ink); }
+.ed { width: 100%; font: inherit; font-size: 16px; line-height: 1.45; color: var(--ink); background: var(--map); border: 2px solid var(--line); border-radius: 10px; padding: 8px 10px; resize: vertical; min-height: 52px; }
+.ed:focus { outline: none; border-color: var(--route); background: var(--surface); }
+.ab-btn.custom .ab-n { background: var(--way-soft); color: var(--ink); }
+.add-ab { font: inherit; font-size: 14px; font-weight: 800; text-align: right; background: transparent; border: 2px dashed var(--line); border-radius: 14px; padding: 9px 12px; cursor: pointer; color: var(--muted); }
+.add-ab:hover { border-color: var(--route); color: var(--route); }
+@media (max-width: 600px) { .guide { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .route.picking .here-btn { animation: none; } }
 .turn { position: relative; display: flex; gap: 10px; align-items: flex-start; background: var(--way-soft); border-radius: 16px; padding: 10px 14px; font-size: 15px; animation: rise .35s ease-out both; animation-delay: calc(var(--i, 0) * 60ms); }
 .turn svg { flex: none; width: 22px; height: 22px; color: var(--ink); margin-top: 2px; }
 .turn b { display: block; font-size: 12px; font-weight: 800; color: var(--muted); }
@@ -197,6 +227,12 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
     <a class="home" href="https://hilaurbach-pisga-holon.github.io/pisga-holon-skills/">לאתר המרכז ←</a>
   </header>
 
+  <section class="guide" aria-label="איך משתמשים: שלושה צעדים">
+    <div class="gstep done" id="g1"><span class="gn">1</span><div><b>בוחרים מיומנות ויכולת</b><span class="s">בחיפוש, או: שער, מיומנות, יכולת</span></div></div>
+    <div class="gstep done" id="g2"><span class="gn">2</span><div><b>בוחרים שלב חינוך</b><span class="s">הכלי מסמן את היעד המוצע</span></div></div>
+    <div class="gstep" id="g3"><span class="gn">3</span><div><b>מסמנים איפה התלמידים היום</b><span class="s">לוחצים "התלמידים שלנו כאן" ומקבלים את הצעד הבא</span></div></div>
+  </section>
+
   <section class="card" aria-label="בחירת יעד">
     <div class="search-row">
       <input id="q" type="search" placeholder="חיפוש: הקשבה, טיעון, אמפתיה..." aria-label="חיפוש">
@@ -228,14 +264,23 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
     <span class="eta-chip" id="etaChip"></span>
   </section>
 
+  <div class="callout" id="pickHint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>צעד 3: איפה רוב התלמידים שלכם היום? קראו את ארבע הרמות, ולחצו "התלמידים שלנו כאן" ברמה המתאימה. הכלי יציג את הצעד הבא ומה עושים בכיתה כדי להגיע אליו.</span></div>
+
+  <div class="editbar">
+    <button class="mini-btn" id="editBtn" type="button" aria-pressed="false">התאמה לצוות שלנו</button>
+    <button class="mini-btn" id="revertBtn" type="button" hidden>חזרה להצעת המרכז</button>
+    <p class="help" id="editHelp" style="flex:1 1 260px">הרמות לא מתאימות ליכולת או לתלמידים שלכם? אפשר לערוך אותן כאן. השינויים נשמרים רק בדפדפן הזה, ונכנסים להעתקה.</p>
+  </div>
+
   <section class="route" id="route" aria-label="המסלול: ארבע רמות ואיך עוברים ביניהן"></section>
 
   <div class="actions">
-    <button class="btn" id="copyBtn" type="button">העתקת המסלול</button>
-    <button class="btn ghost" id="linkBtn" type="button">העתקת קישור ליכולת</button>
-    <button class="btn ghost" id="resetBtn" type="button">חישוב מסלול מחדש</button>
+    <button class="btn" id="copyBtn" type="button">העתקת ארבע הרמות כטקסט</button>
+    <button class="btn ghost" id="linkBtn" type="button">שיתוף היכולת בקישור</button>
+    <button class="btn ghost" id="resetBtn" type="button">ניקוי הסימון</button>
     <span class="toast" id="toast" role="status"></span>
   </div>
+  <p class="help"><b>העתקת ארבע הרמות כטקסט:</b> מעתיקה את הרמות ואת המעברים, להדבקה במסמך, במצגת או בהודעה. <b>שיתוף היכולת בקישור:</b> מעתיקה קישור שפותח את מחשב המסלול ישר ביכולת הזו, למשל כדי לשלוח לצוות.</p>
 
   <section class="card lad" id="ladCard" hidden></section>
 
@@ -250,6 +295,7 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
     <div class="cam">
       <h3>מבחן המצלמה: האם מצלמה הייתה קולטת את זה?</h3>
       <p>נקודת ציון טובה היא פעולה שרואים או שומעים. כתבו ניסוח ובדקו אותו.</p>
+      <p><b style="color:var(--ink)">מה זה?</b> כלל אצבע שמרכז הל"ה משתמש בו, לא כלי מחקרי. הוא נשען על עיקרון מוכר בכתיבת מטרות הוראה: מטרה טובה מתארת התנהגות שאפשר לראות או לשמוע (Mager, 1962). "מבין" ו"יודע" הן מטרות חשובות, אבל כדי לתרגל ולהעריך אותן מתרגמים אותן לפעולה נראית.</p>
       <div class="ex"><span class="y">מנסח</span><span class="y">שואל</span><span class="y">מציג</span><span class="y">מחלק תפקידים</span><span class="n">מבין</span><span class="n">יודע</span><span class="n">מודע</span><span class="n">מעריך</span></div>
       <div class="cam-row">
         <input id="camInput" type="text" placeholder="למשל: התלמיד מבין את רגשות חבריו" aria-label="ניסוח לבדיקה">
@@ -260,7 +306,7 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
   </details>
 
   <div class="note">
-    <strong>איך משתמשים:</strong> בוחרים שער (מיומנויות, ערכים או כשירויות משלימות), מיומנות ויכולת, ושלב חינוך. מקבלים רצף של ארבע רמות, ובין כל שתי רמות: איך עוברים. לוחצים "אנחנו כאן" על הרמה שבה רוב התלמידים נמצאים היום, ומקבלים את הצעד הבא.
+    <strong>איך משתמשים:</strong> בוחרים שער (מיומנויות, ערכים או כשירויות משלימות), מיומנות ויכולת, ושלב חינוך. מקבלים רצף של ארבע רמות, ובין כל שתי רמות: איך עוברים. לוחצים "התלמידים שלנו כאן" על הרמה שבה רוב התלמידים נמצאים היום, ומקבלים את הצעד הבא. לא מצאתם יכולת מתאימה, או שהרמות לא מתאימות? "התאמה לצוות שלנו" מאפשרת לערוך, ו"יכולת משלנו" מאפשרת לבנות רצף חדש.
     <br><br>
     <strong>חשוב לדעת:</strong> ההגדרות והפירוק ליכולות לקוחים מהמקורות הרשמיים, כפי שרוכזו ב<a href="https://ramishaked.github.io/ed-skills/" target="_blank" rel="noopener">מפת המיומנויות והערכים</a>. הרמות, המעברים והיעד לפי שלב החינוך הם הצעה של מרכז הל"ה למיומנויות ואינם ניסוח של משרד החינוך. המקורות הרשמיים: <a href="https://meyda.education.gov.il/files/Planning/dmuthabogermismach.pdf" target="_blank" rel="noopener">מסמך דמות הבוגרת והבוגר</a>, ובו הפירוק ליכולות ולפעולות, ו<a href="https://meyda.education.gov.il/files/Planning/dmuthabogeravneiderech.pdf" target="_blank" rel="noopener">מסמך המיומנויות ואבני הדרך</a>, ובו אבני הדרך לכל שלב גיל. מתאימים לתלמידים שלכם. הרצף נועד להערכה מעצבת ולשיח, ולא לציונים. המתודולוגיה מבוססת על "למידה מבוססת מיומנויות: ארגז כלים למורה ולמנהל/ת", מרכז פואנטה, 2021.
   </div>
@@ -292,6 +338,21 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
     s.ab.forEach(function (a, i) { a.sk = s.id; a.i = i; AB[a.id] = a; });
   }); }); });
 
+  // team edits and custom abilities, kept only in this browser
+  var TEAM = {};
+  try { TEAM = JSON.parse(localStorage.getItem('route-team-v1') || '{}') || {}; } catch (e) { TEAM = {}; }
+  function saveTeam() { try { localStorage.setItem('route-team-v1', JSON.stringify(TEAM)); } catch (e) {} }
+  Object.keys(TEAM).forEach(function (id) {
+    var x = TEAM[id]; if (!x || !x.custom || !SK[x.sk] || AB[id]) return;
+    var a = { id: id, n: x.n || 'יכולת משלנו', d: '', lv: ['', '', '', ''], tr: ['', '', ''], g: '', custom: 1, sk: x.sk };
+    SK[x.sk].ab.push(a); a.i = SK[x.sk].ab.length - 1; AB[id] = a;
+  });
+  function eff(a) {
+    var x = TEAM[a.id] || {};
+    return { n: x.n || a.n, lv: (x.lv || a.lv).slice(), tr: (x.tr || a.tr).slice(), edited: !!(x.lv || x.tr || (x.n && !a.custom)), custom: !!a.custom };
+  }
+  var editing = false;
+
   var state = { cat: 'S', skill: 'S11', ab: 'S11.1', stage: 'z9', here: -1 };
   try {
     var sv = JSON.parse(localStorage.getItem('route-state-v2') || 'null');
@@ -310,7 +371,7 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
   function save() {
     try { localStorage.setItem('route-state-v2', JSON.stringify({ ab: state.ab, stage: state.stage })); } catch (e) {}
-    try { history.replaceState(null, '', '#' + state.ab); } catch (e) {}
+    try { if (!AB[state.ab] || !AB[state.ab].custom) history.replaceState(null, '', '#' + state.ab); } catch (e) {}
   }
   function stage() { return STAGES.filter(function (s) { return s.id === state.stage; })[0] || STAGES[2]; }
   function color() { return CATC[state.cat]; }
@@ -379,17 +440,29 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
     var lastG = '';
     s.ab.forEach(function (a, i) {
       if (a.g && a.g !== lastG) { list.appendChild(el('div', 'grp-h', a.g)); lastG = a.g; }
-      var b = el('button', 'ab-btn'); b.type = 'button';
+      var b = el('button', 'ab-btn' + (a.custom ? ' custom' : '')); b.type = 'button';
       b.setAttribute('aria-pressed', String(state.ab === a.id));
-      b.appendChild(el('span', 'ab-n', String(i + 1)));
-      var t = el('span', 'ab-t'); var bn = el('b', null, a.n);
+      b.appendChild(el('span', 'ab-n', a.custom ? '+' : String(i + 1)));
+      var t = el('span', 'ab-t'); var bn = el('b', null, eff(a).n);
       if (a.lad) bn.appendChild(el('span', 'mini', 'יש מדרג וכלים'));
+      if (a.custom) bn.appendChild(el('span', 'mini', 'של הצוות'));
+      else if (eff(a).edited) bn.appendChild(el('span', 'mini', 'נערך בצוות'));
       t.appendChild(bn);
       if (state.ab === a.id && a.d) t.appendChild(el('small', null, a.d));
       b.appendChild(t);
-      b.addEventListener('click', function () { state.ab = a.id; state.here = -1; save(); renderSkill(); renderRoute(); renderEta(); renderLad(); });
+      b.addEventListener('click', function () { state.ab = a.id; state.here = -1; editing = !!a.custom; save(); renderSkill(); renderRoute(); renderEta(); renderLad(); });
       list.appendChild(b);
     });
+    var add = el('button', 'add-ab', '+ יכולת משלנו: בונים רצף חדש למיומנות הזו'); add.type = 'button';
+    add.addEventListener('click', function () {
+      var id = s.id + '.U' + Date.now().toString(36);
+      TEAM[id] = { custom: true, sk: s.id, n: 'יכולת משלנו', lv: ['אני ', 'אני ', 'אני ', 'אני '], tr: ['', '', ''] }; saveTeam();
+      var a = { id: id, n: 'יכולת משלנו', d: '', lv: ['', '', '', ''], tr: ['', '', ''], g: '', custom: 1, sk: s.id };
+      s.ab.push(a); a.i = s.ab.length - 1; AB[id] = a;
+      state.ab = id; state.here = -1; editing = true; save(); renderAll();
+      $('route').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    list.appendChild(add);
     c.appendChild(list);
     if (s.lad) {
       var p = el('p', 'srcs', 'למיומנות כולה יש גם מדרג מפורט וכלים. ראו למטה.');
@@ -405,52 +478,85 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
     });
   }
   var ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V8"/><path d="M7 12l5-5 5 5"/><path d="M5 4h14"/></svg>';
+  var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+  function teamSet(field, idx, val) {
+    var a = AB[state.ab], e = eff(a), x = TEAM[a.id] || (TEAM[a.id] = {});
+    if (field === 'n') x.n = val;
+    else { if (!x[field]) x[field] = e[field].slice(); x[field][idx] = val; }
+    saveTeam(); $('revertBtn').hidden = false;
+  }
+  function edBox(field, idx, val, label) {
+    var ta = el('textarea', 'ed'); ta.value = val; ta.setAttribute('aria-label', label); ta.rows = 2;
+    ta.addEventListener('input', function () { teamSet(field, idx, ta.value); });
+    ta.addEventListener('change', function () { renderEta(); renderSkill(); });
+    return ta;
+  }
+  function renderEditBar() {
+    var a = AB[state.ab], e = eff(a);
+    $('editBtn').setAttribute('aria-pressed', String(editing));
+    $('editBtn').textContent = editing ? 'סיום עריכה' : (a.custom ? 'עריכת היכולת שלנו' : 'התאמה לצוות שלנו');
+    $('revertBtn').hidden = !(TEAM[a.id]);
+    $('revertBtn').textContent = a.custom ? 'מחיקת היכולת שלנו' : 'חזרה להצעת המרכז';
+  }
   function renderRoute() {
-    var a = AB[state.ab], st = stage(), r = $('route');
+    var a = AB[state.ab], e = eff(a), st = stage(), r = $('route');
     r.innerHTML = ''; r.style.setProperty('--route', color());
+    r.classList.toggle('picking', state.here === -1 && !editing);
+    $('pickHint').hidden = state.here !== -1 || editing;
+    renderEditBar();
     var start = el('article', 'stop start' + (state.here === -1 ? ' current' : ''));
     var sh = el('div', 'stop-head');
     sh.appendChild(el('span', 'stop-num', 'המראה'));
-    sh.appendChild(el('h2', 'stop-title', a.n));
+    if (editing) sh.appendChild(edBox('n', 0, e.n, 'שם היכולת'));
+    else sh.appendChild(el('h2', 'stop-title', e.n));
+    if (e.custom) sh.appendChild(el('span', 'tag team', 'יכולת של הצוות'));
+    else if (e.edited) sh.appendChild(el('span', 'tag team', 'גרסת הצוות'));
     start.appendChild(sh);
     start.appendChild(el('p', 'kicker', SK[a.sk].n + (a.s20 ? ' · חלק מ"הלומד העצמאי"' : '') + ' · יעד מוצע ל' + st.label + ': ' + LEVELS[st.band[1]]));
     r.appendChild(start);
-    a.lv.forEach(function (txt, i) {
+    e.lv.forEach(function (txt, i) {
       var cls = 'stop';
       if (state.here > i) cls += ' done';
       if (state.here === i) cls += ' current';
-      else if (state.here + 1 === i) cls += ' next';
+      else if (state.here > -1 && state.here + 1 === i) cls += ' next';
       else if (i === st.band[1] && state.here < i) cls += ' target';
       var card = el('article', cls); card.style.setProperty('--i', i * 2 + 1);
       var head = el('div', 'stop-head');
       head.appendChild(el('span', 'stop-num', LEVELS[i]));
-      head.appendChild(el('h3', 'stop-title', txt));
+      if (editing) head.appendChild(edBox('lv', i, txt, 'רמה ' + LEVELS[i] + ': התנהגות מצופה'));
+      else head.appendChild(el('h3', 'stop-title', txt || '(עוד לא נכתב)'));
       card.appendChild(head);
       var bd = el('div', 'badges');
-      if (state.here === i) bd.appendChild(el('span', 'badge here', 'אנחנו כאן'));
-      else if (state.here + 1 === i) bd.appendChild(el('span', 'badge next', 'הרמה הבאה'));
+      if (state.here === i) bd.appendChild(el('span', 'badge here', 'התלמידים שלנו כאן'));
+      else if (state.here > -1 && state.here + 1 === i) bd.appendChild(el('span', 'badge next', 'הצעד הבא'));
       else if (state.here > i) bd.appendChild(el('span', 'badge done', 'עברנו'));
       if (i === st.band[1]) bd.appendChild(el('span', 'badge goal', 'יעד מוצע ל' + st.label));
       else if (i >= st.band[0] && i < st.band[1]) bd.appendChild(el('span', 'badge band', 'טווח צפוי ל' + st.label));
       if (bd.childNodes.length) card.appendChild(bd);
-      var hb = el('button', 'here-btn', state.here === i ? 'ביטול הסימון' : 'אנחנו כאן'); hb.type = 'button';
-      hb.addEventListener('click', function () { state.here = (state.here === i) ? -1 : i; renderRoute(); renderEta(); });
-      card.appendChild(hb);
+      if (!editing) {
+        var hb = el('button', 'here-btn' + (state.here === i ? ' on' : '')); hb.type = 'button';
+        hb.innerHTML = PIN; hb.appendChild(document.createTextNode(state.here === i ? 'התלמידים שלנו כאן (לחיצה מבטלת)' : 'התלמידים שלנו כאן'));
+        hb.setAttribute('aria-pressed', String(state.here === i));
+        hb.addEventListener('click', function () { state.here = (state.here === i) ? -1 : i; renderRoute(); renderEta(); if (state.here > -1) document.querySelector('.eta').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+        card.appendChild(hb);
+      }
       r.appendChild(card);
       if (i < 3) {
         var t = el('div', 'turn' + (state.here === i ? ' focus' : '')); t.style.setProperty('--i', i * 2 + 2);
         t.innerHTML = ARROW;
         var tx = el('div'); tx.appendChild(el('b', null, 'איך עוברים מ' + LEVELS[i] + ' ל' + LEVELS[i + 1]));
-        tx.appendChild(document.createTextNode(a.tr[i]));
+        if (editing) tx.appendChild(edBox('tr', i, e.tr[i], 'איך עוברים מ' + LEVELS[i] + ' ל' + LEVELS[i + 1]));
+        else tx.appendChild(document.createTextNode(e.tr[i] || '(עוד לא נכתב)'));
         t.appendChild(tx); r.appendChild(t);
       }
     });
   }
   function renderEta() {
-    var a = AB[state.ab], st = stage();
+    var a0 = AB[state.ab], a = eff(a0), st = stage();
+    $('g3').className = 'gstep ' + (state.here === -1 ? 'now' : 'done');
     if (state.here === -1) {
       $('etaTitle').textContent = 'המסלול חושב · ' + a.n + ' · ' + st.label;
-      $('etaNext').textContent = 'סמנו "אנחנו כאן" ברמה שבה רוב התלמידים נמצאים היום.';
+      $('etaNext').textContent = 'סמנו "התלמידים שלנו כאן" ברמה שבה רוב התלמידים נמצאים היום, ותקבלו כאן את הצעד הבא.';
       $('etaChip').textContent = 'יעד: ' + LEVELS[st.band[1]];
     } else if (state.here >= 3) {
       $('etaTitle').textContent = 'נחתתם ברמה הגבוהה';
@@ -458,7 +564,7 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
       $('etaChip').textContent = 'כל הרמות';
     } else {
       $('etaTitle').textContent = 'הצעד הבא: ' + LEVELS[state.here + 1];
-      $('etaNext').textContent = 'בכיתה: ' + a.tr[state.here];
+      $('etaNext').textContent = 'בכיתה: ' + (a.tr[state.here] || 'כתבו מה עושים בכיתה בעזרת "התאמה לצוות שלנו".');
       var gap = st.band[1] - state.here;
       $('etaChip').textContent = gap > 0 ? 'עוד ' + gap + ' ליעד' : 'היעד הושג';
     }
@@ -492,18 +598,17 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
   }
   function renderLad() {
     var a = AB[state.ab], s = SK[state.skill], c = $('ladCard');
-    var ids = (a.lad || []), sids = (s.lad || []);
+    var ids = (a.lad || []), sids = (s.lad || []), xa = a.xa || [];
     c.innerHTML = '';
-    var xa = a.xa || [];
     if (!ids.length && !sids.length && !xa.length) { c.hidden = true; return; }
     c.hidden = false;
     c.appendChild(el('h2', 'skill-name', 'פירוק מעמיק: מדרג וכלים'));
-    c.appendChild(el('p', 'lad-intro', 'מתוך המדרג של מרכז הל"ה באתר המרכז: תת-מיומנויות, ארבעה שלבים (מתחיל, מתפתח, מיומן, מוביל), כלי קצר לכל מעבר ופעילויות מוכנות.'));
     if (xa.length) {
       var xb = el('div', 'acts'); xb.appendChild(el('b', null, 'פעילויות לכיתה ליכולת הזו:'));
       xa.forEach(function (x) { var row = el('div'); var a1 = el('a', null, x.t); a1.href = BASE + x.h; a1.target = '_blank'; a1.rel = 'noopener'; row.appendChild(a1); row.appendChild(document.createTextNode(' (' + x.info + ') · ')); var a2 = el('a', null, 'דף להדפסה'); a2.href = BASE + 'print-' + x.h.split('#')[1] + '.html'; a2.target = '_blank'; a2.rel = 'noopener'; row.appendChild(a2); xb.appendChild(row); });
       c.appendChild(xb);
     }
+    c.appendChild(el('p', 'lad-intro', 'מתוך המדרג של מרכז הל"ה באתר המרכז: תת-מיומנויות, ארבעה שלבים (מתחיל, מתפתח, מיומן, מוביל), כלי קצר לכל מעבר ופעילויות מוכנות.'));
     if (ids.length) {
       c.appendChild(el('div', 'grp-h', 'ליכולת "' + a.n + '"'));
       ids.forEach(function (id, i) { var b = ladBlock(id); if (b) { if (i === 0) b.open = true; c.appendChild(b); } });
@@ -541,10 +646,10 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
   window.addEventListener('hashchange', function () { if (fromHash()) renderAll(); });
 
   function routeText() {
-    var a = AB[state.ab], st = stage();
-    var L = ['מחשב המסלול · ' + SK[a.sk].n + ' · ' + a.n, 'שלב חינוך: ' + st.label + ' · יעד מוצע: ' + LEVELS[st.band[1]], ''];
+    var a0 = AB[state.ab], a = eff(a0), st = stage();
+    var L = ['מחשב המסלול · ' + SK[a0.sk].n + ' · ' + a.n + (a.custom ? ' (יכולת של הצוות)' : a.edited ? ' (גרסת הצוות)' : ''), 'שלב חינוך: ' + st.label + ' · יעד מוצע: ' + LEVELS[st.band[1]], ''];
     a.lv.forEach(function (t, i) { L.push(LEVELS[i] + ': ' + t); if (i < 3) L.push('  איך עוברים: ' + a.tr[i]); });
-    L.push('', 'הצעה של מרכז הל"ה למיומנויות, פסג"ה חולון. אינה ניסוח של משרד החינוך.');
+    L.push('', a.custom || a.edited ? 'מבוסס על הצעה של מרכז הל"ה למיומנויות, עם התאמות הצוות.' : 'הצעה של מרכז הל"ה למיומנויות, פסג"ה חולון. אינה ניסוח של משרד החינוך.');
     return L.join('\n');
   }
   function flash(m) { $('toast').textContent = m; setTimeout(function () { $('toast').textContent = ''; }, 2500); }
@@ -554,8 +659,19 @@ footer { font-size: 13px; color: var(--muted); text-align: center; }
     try { navigator.clipboard.writeText(text).then(function () { fb.hidden = true; flash(ok); }, fallback); } catch (e) { fallback(); }
   }
   $('copyBtn').addEventListener('click', function () { copy(routeText(), 'המסלול הועתק'); });
-  $('linkBtn').addEventListener('click', function () { copy((/^https?:/.test(location.protocol) && location.hostname.indexOf('claude') === -1 ? location.origin + location.pathname : 'https://hilaurbach-pisga-holon.github.io/pisga-holon-skills/route.html') + '#' + state.ab, 'הקישור הועתק'); });
-  $('resetBtn').addEventListener('click', function () { state.here = -1; renderRoute(); renderEta(); flash('המסלול חושב מחדש'); });
+  $('editBtn').addEventListener('click', function () { editing = !editing; if (!editing) state.here = -1; renderSkill(); renderRoute(); renderEta(); });
+  $('revertBtn').addEventListener('click', function () {
+    var a = AB[state.ab];
+    if (a.custom) {
+      delete TEAM[a.id]; saveTeam();
+      var s = SK[a.sk]; s.ab = s.ab.filter(function (x) { return x.id !== a.id; }); delete AB[a.id];
+      state.ab = s.ab[0].id; editing = false; save(); renderAll(); flash('היכולת של הצוות נמחקה');
+    } else { delete TEAM[a.id]; saveTeam(); editing = false; renderAll(); flash('חזרנו להצעת המרכז'); }
+  });
+  $('linkBtn').addEventListener('click', function () {
+    if (AB[state.ab].custom) { flash('יכולת של הצוות שמורה רק בדפדפן הזה. שתפו אותה בהעתקה כטקסט.'); return; }
+    copy((/^https?:/.test(location.protocol) && location.hostname.indexOf('claude') === -1 ? location.origin + location.pathname : 'https://hilaurbach-pisga-holon.github.io/pisga-holon-skills/route.html') + '#' + state.ab, 'הקישור הועתק'); });
+  $('resetBtn').addEventListener('click', function () { state.here = -1; renderRoute(); renderEta(); flash('הסימון נוקה'); });
 
   var HIDDEN = ['מבין', 'מבינה', 'יבין', 'הבנה', 'יודע', 'יודעת', 'ידע', 'מודע', 'מודעת', 'מודעות', 'מעריך', 'מעריכה', 'מכיר', 'מכירה', 'לומד', 'לומדת', 'חושב', 'חושבת', 'מרגיש', 'מרגישה', 'מפנים', 'מפנימה', 'רוצה', 'אוהב', 'אוהבת', 'מתעניין', 'מתעניינת', 'מסוגל', 'מסוגלת', 'שולט', 'שולטת', 'זוכר', 'זוכרת', 'מאמין', 'מקבל', 'מכבד'];
   function camCheck() {
